@@ -298,6 +298,7 @@ CMakeFiles/App.dir/src/App.cpp.o: \
  /usr/local/include/wx-3.2/wx/splitter.h \
  /usr/local/include/wx-3.2/wx/generic/splitter.h \
  /usr/local/include/wx-3.2/wx/containr.h \
+ /usr/local/include/wx-3.2/wx/tokenzr.h \
  /usr/local/include/wx-3.2/wx/wxprec.h /usr/local/include/wx-3.2/wx/wx.h \
  /usr/local/include/wx-3.2/wx/hash.h /usr/local/include/wx-3.2/wx/log.h \
  /usr/local/include/wx-3.2/wx/time.h \
@@ -432,8 +433,23 @@ CMakeFiles/App.dir/src/App.cpp.o: \
  /usr/local/include/wx-3.2/wx/gtk/filectrl.h \
  /usr/local/include/wx-3.2/wx/filectrl.h \
  /usr/local/include/wx-3.2/wx/mdi.h \
- /usr/local/include/wx-3.2/wx/gtk/mdi.h /usr/include/c++/12/fstream \
+ /usr/local/include/wx-3.2/wx/gtk/mdi.h \
+ /home/mindflayer/Documents/c++/PAMSI/Projekt_1/src/../inc/SLPQueue.h \
+ /home/mindflayer/Documents/c++/PAMSI/Projekt_1/src/../inc/QueueEmpty.h \
+ /home/mindflayer/Documents/c++/PAMSI/Projekt_1/src/../inc/RunTimeException.h \
+ /home/mindflayer/Documents/c++/PAMSI/Projekt_1/src/../inc/SNode.h \
+ /home/mindflayer/Documents/c++/PAMSI/Projekt_1/src/../inc/Utility.h \
+ /usr/include/c++/12/list /usr/include/c++/12/bits/stl_list.h \
+ /usr/include/c++/12/bits/allocated_ptr.h \
+ /usr/include/c++/12/bits/list.tcc /usr/include/c++/12/set \
+ /usr/include/c++/12/bits/stl_tree.h /usr/include/c++/12/bits/stl_set.h \
+ /usr/include/c++/12/bits/stl_multiset.h /usr/include/c++/12/fstream \
  /usr/include/c++/12/bits/codecvt.h \
  /usr/include/c++/12/x86_64-redhat-linux/bits/basic_file.h \
  /usr/include/c++/12/x86_64-redhat-linux/bits/c++io.h \
- /usr/include/c++/12/bits/fstream.tcc
+ /usr/include/c++/12/bits/fstream.tcc /usr/include/c++/12/random \
+ /usr/include/c++/12/bits/random.h \
+ /usr/include/c++/12/x86_64-redhat-linux/bits/opt_random.h \
+ /usr/include/c++/12/bits/random.tcc /usr/include/c++/12/numeric \
+ /usr/include/c++/12/bits/stl_numeric.h /usr/include/c++/12/bit \
+ /usr/include/c++/12/pstl/glue_numeric_defs.h

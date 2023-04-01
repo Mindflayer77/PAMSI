@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "App.pdb"
   "CMakeFiles/App.dir/src/App.cpp.o"
   "CMakeFiles/App.dir/src/App.cpp.o.d"
+  "CMakeFiles/App.dir/src/Utility.cpp.o"
+  "CMakeFiles/App.dir/src/Utility.cpp.o.d"
 )
 
 # Per-language clean rules from dependency scanning.
