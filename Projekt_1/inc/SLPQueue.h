@@ -20,6 +20,8 @@ public:
   int getSize() const { return size; }
   const T &getFront() const;
   const T &getBack() const;
+  const SNode<T> *const getFrontElem() const {return front;}
+  const T& min() const;
   void display() const;
   bool remove(const T &elem);
 };
@@ -85,6 +87,18 @@ template <typename T> const T &SLPQueue<T>::getBack() const {
     return back->elem;
   static T t;
   return t;
+}
+
+template<typename T> const T& SLPQueue<T>::min() const {
+  SNode<T>* iter = front;
+  static T min;
+  while(iter != back){
+    if(iter->priority > iter->next->priority){
+      min = iter->next->priority;
+    }
+    iter = iter->next;
+  }
+  return min;
 }
 
 template <typename T>

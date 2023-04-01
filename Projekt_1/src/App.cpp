@@ -3,12 +3,17 @@
 // For compilers that support precompilation, includes "wx/wx.h".
 #include <wx/notebook.h>
 #include <wx/splitter.h>
+#include <wx/tokenzr.h>
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include "../inc/SLPQueue.h"
+#include "../inc/Utility.h"
 #include <fstream>
 #include <iostream>
+#include <random>
+#include <set>
 
 const wxString appName = "Project number 1";
 
@@ -24,6 +29,8 @@ class MyFrame : public wxFrame
     MyFrame(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style);
 
   private:
+    SLPQueue<wxString> queue;
+
     wxMenu *menuFile;
     wxMenu *menuHelp;
     wxMenuBar *menuBar;
@@ -209,18 +216,35 @@ void MyFrame::OnHello(wxCommandEvent &event)
 
 void MyFrame::OnSend(wxCommandEvent &event)
 {
-    wxString data;
-    int line = 0;
-    int numLines = editor->GetNumberOfLines();
-    std::ofstream ostrm("../txt/out.txt", std::ios::out | std::ios::app);
-    while (line != numLines)
+    wxString data, token;
+    data = editor->GetValue();
+    int priority = 1;
+    wxStringTokenizer tokenizer(data, " ");
+    std::ofstream ostrm("../txt/out.txt", std::ios::out | std::ios::binary);
+    time_t start, end;
+    time(&start);
+    while (tokenizer.HasMoreTokens())
+    {
+        token = tokenizer.GetNextToken();
+        queue.enQueue(token, priority++);
+    }
+    int size = queue.getSize();
+    std::set<int> genNum;
+    srand((unsigned)time(NULL));
+    int pos = rand() % size;
+    const SNode<wxString> * tmp;
+    while (genNum.size() != size -1)
     {
         try
         {
-            data = editor->GetLineText(line++);
-            ostrm << data;
-            if (line != numLines)
-                ostrm << "\n";
+            tmp = queue.getFrontElem();
+            ostrm.seekp((pos - 1) * sizeof(SNode<wxString>));
+            ostrm.write(reinterpret_cast<const char *>(tmp), sizeof(SNode<wxString>));
+            genNum.insert(pos);
+            queue.deQueue();
+            while(contains(genNum, pos) && genNum.size() != size){
+                pos = rand() % size;
+            }
         }
         catch (const std::exception &e)
         {
@@ -230,8 +254,11 @@ void MyFrame::OnSend(wxCommandEvent &event)
         }
     }
     ostrm.close();
+    time(&end);
     editor->Clear();
     *console << wxT("Sending data...\n");
+    *console << wxT("Sent ") << priority - 1 << wxT("packets\n");
+    *console << wxT("Execution time: ") << double(end - start) << "seconds\n";
     statBar->SetStatusText(wxT("Data send successfully"));
 }
 
@@ -263,4 +290,6 @@ void MyFrame::OnNewFile(wxCommandEvent &event)
     editor->Clear();
     statBar->SetStatusText(wxT("Created a new file"));
     *console << wxT("Creating a new file...\n");
+    if (remove("../txt/out.txt") != 0)
+        perror("Error occured: ");
 }
