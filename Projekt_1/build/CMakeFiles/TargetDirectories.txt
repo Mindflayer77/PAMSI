@@ -1,3 +1,0 @@
-/home/mindflayer/Documents/c++/PAMSI/Projekt_1/build/CMakeFiles/App.dir
-/home/mindflayer/Documents/c++/PAMSI/Projekt_1/build/CMakeFiles/edit_cache.dir
-/home/mindflayer/Documents/c++/PAMSI/Projekt_1/build/CMakeFiles/rebuild_cache.dir
