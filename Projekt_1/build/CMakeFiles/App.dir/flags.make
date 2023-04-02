@@ -6,5 +6,5 @@ CXX_DEFINES = -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK__
 
 CXX_INCLUDES = -isystem /usr/local/lib/wx/include/gtk2-unicode-3.2 -isystem /usr/local/include/wx-3.2
 
-CXX_FLAGS =  -pthread
+CXX_FLAGS =  -pthread -g
 

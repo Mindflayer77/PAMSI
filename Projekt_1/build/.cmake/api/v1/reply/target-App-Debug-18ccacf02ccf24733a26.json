@@ -75,7 +75,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -pthread"
+					"fragment" : " -pthread -g"
 				}
 			],
 			"defines" : 
@@ -120,7 +120,7 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "-pthread",
+				"fragment" : "-pthread -g",
 				"role" : "flags"
 			},
 			{

@@ -10,9 +10,9 @@
 #endif
 #include "../inc/SLPQueue.h"
 #include "../inc/Utility.h"
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <random>
 #include <set>
 
 const wxString appName = "Project number 1";
@@ -223,6 +223,11 @@ void MyFrame::OnSend(wxCommandEvent &event)
     std::ofstream ostrm("../txt/out.txt", std::ios::out | std::ios::binary);
     time_t start, end;
     time(&start);
+    char arr[15];
+    auto conv = [&](const wxString &str, char arr[]) {
+        strcpy(arr, (const char *)str.mb_str(wxConvUTF8));
+        arr[str.length()] = '\0';
+    };
     while (tokenizer.HasMoreTokens())
     {
         token = tokenizer.GetNextToken();
@@ -230,20 +235,23 @@ void MyFrame::OnSend(wxCommandEvent &event)
     }
     int size = queue.getSize();
     std::set<int> genNum;
+    std::pair<char[15], int> tmp;
     srand((unsigned)time(NULL));
-    int pos = rand() % size;
-    const SNode<wxString> * tmp;
-    while (genNum.size() != size -1)
+    int pos = rand() % size + 1;
+    genNum.insert(pos);
+    while (genNum.size() != size)
     {
         try
         {
-            tmp = queue.getFrontElem();
-            ostrm.seekp((pos - 1) * sizeof(SNode<wxString>));
-            ostrm.write(reinterpret_cast<const char *>(tmp), sizeof(SNode<wxString>));
+            conv(queue.getFrontNode()->getElem(), tmp.first);
+            tmp.second = queue.getFrontNode()->getPriority();
+            ostrm.seekp((pos - 1) * sizeof(tmp));
+            ostrm.write(reinterpret_cast<const char *>(&tmp), sizeof(tmp));
             genNum.insert(pos);
             queue.deQueue();
-            while(contains(genNum, pos) && genNum.size() != size){
-                pos = rand() % size;
+            while (contains(genNum, pos) && genNum.size() != size)
+            {
+                pos = rand() % size + 1;
             }
         }
         catch (const std::exception &e)
@@ -251,36 +259,48 @@ void MyFrame::OnSend(wxCommandEvent &event)
             std::cerr << e.what() << '\n';
             ostrm.close();
             event.Skip();
+            break;
         }
     }
     ostrm.close();
     time(&end);
     editor->Clear();
     *console << wxT("Sending data...\n");
-    *console << wxT("Sent ") << priority - 1 << wxT("packets\n");
-    *console << wxT("Execution time: ") << double(end - start) << "seconds\n";
+    *console << wxT("Sent ") << priority - 1 << wxT(" packets\n");
+    *console << wxT("Execution time: ") << double(end - start) << " seconds\n";
     statBar->SetStatusText(wxT("Data send successfully"));
 }
 
 void MyFrame::OnReceive(wxCommandEvent &event)
 {
-    std::string data = "";
-    std::ifstream istrm("../txt/out.txt", std::ios::in);
+    std::ifstream istrm("../txt/out.txt", std::ios::in | std::ios::binary);
+    std::pair<char[15], int> tmp;
+    auto conv = [&](const wxString &str, char arr[]) {
+        strcpy(arr, (const char *)str.mb_str(wxConvUTF8));
+        arr[str.length()] = '\0';
+    };
     while (!istrm.eof())
     {
         try
         {
-            istrm >> data;
-            *editor << data << " ";
+            istrm.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+            queue.enQueue(tmp.first, tmp.second);
         }
         catch (const std::exception &e)
         {
             std::cerr << e.what() << '\n';
             istrm.close();
             event.Skip();
+            break;
         }
     }
+    std::ostream ostrm(editor);
     istrm.close();
+    if (queue.display(ostrm).fail())
+    {
+        *console << wxT("Error while displaying data\n");
+    }
+
     *console << wxT("Receiving data...\n");
     statBar->SetStatusText(wxT("Data received successfully"));
 }

@@ -13,4 +13,6 @@ public:
   SNode() : next(nullptr), priority(0) {}
   ~SNode() {}
   friend class SLPQueue<T>;
+  T getElem() const {return elem;}
+  int getPriority() const {return priority;}
 };
