@@ -21,6 +21,7 @@ template <typename T> class SLPQueue
     void enQueue(const T &newElem, const int &priority);
     void enQueue(SNode<T> *newNode);
     void deQueue();
+    SNode<T> *removeMin();
     bool isEmpty() const;
     int getSize() const
     {
@@ -34,8 +35,8 @@ template <typename T> class SLPQueue
     }
     const T &min() const;
     void display() const;
-    std::ostream &display(std::ostream &ostrm) const;
     bool remove(const T &elem);
+    void sort();
 };
 
 // tutaj chodzi o to , że musimy mieć wskaźnik na element poprzedni
@@ -95,24 +96,6 @@ template <typename T> void SLPQueue<T>::display() const
     std::cout << " ]" << std::endl;
 }
 
-template <typename T> std::ostream &SLPQueue<T>::display(std::ostream &ostrm) const
-{
-    SNode<T> *tmp = front;
-    while (tmp != nullptr)
-    {
-        try
-        {
-            ostrm << tmp->elem << " ";
-            tmp = tmp->next;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << e.what() << '\n';
-            return ostrm;
-        }
-    }
-    return ostrm;
-}
 template <typename T> bool SLPQueue<T>::isEmpty() const
 {
     return back == nullptr;
@@ -147,6 +130,58 @@ template <typename T> const T &SLPQueue<T>::min() const
         iter = iter->next;
     }
     return min;
+}
+
+template <typename T> SNode<T> *SLPQueue<T>::removeMin()
+{
+    SNode<T> *iter = front, *prevToMin = front, *min = front;
+    while (iter != back)
+    {
+        if (min->priority > iter->next->priority)
+        {
+            min = iter->next;
+            prevToMin = iter;
+        }
+        iter = iter->next;
+    }
+    if (min == front)
+    {
+        front = front->next;
+        min->next = nullptr;
+        if (min == back)
+        {
+            back = front;
+        }
+    }
+    else if (min == back)
+    {
+        prevToMin->next = nullptr;
+        back = prevToMin;
+    }
+    else
+    {
+        prevToMin->next = prevToMin->next->next;
+    }
+    --size;
+    min->next = nullptr;
+    return min;
+}
+
+template <typename T> void SLPQueue<T>::sort()
+{
+    SLPQueue<T> copy;
+    SNode<T> *tmp;
+    while (!this->isEmpty())
+    {
+        copy.enQueue(this->getFrontNode()->getElem(), this->getFrontNode()->getPriority());
+        this->deQueue();
+    }
+    while (!copy.isEmpty())
+    {
+        tmp = copy.removeMin();
+        this->enQueue(tmp->getElem(), tmp->getPriority());
+        delete tmp;
+    }
 }
 
 template <typename T> void SLPQueue<T>::enQueue(const T &newElem, const int &priority)

@@ -30,6 +30,7 @@ class MyFrame : public wxFrame
 
   private:
     SLPQueue<wxString> queue;
+    int packetsSent;
 
     wxMenu *menuFile;
     wxMenu *menuHelp;
@@ -265,8 +266,9 @@ void MyFrame::OnSend(wxCommandEvent &event)
     ostrm.close();
     time(&end);
     editor->Clear();
+    packetsSent = priority - 1;
     *console << wxT("Sending data...\n");
-    *console << wxT("Sent ") << priority - 1 << wxT(" packets\n");
+    *console << wxT("Sent ") << packetsSent << wxT(" packets\n");
     *console << wxT("Execution time: ") << double(end - start) << " seconds\n";
     statBar->SetStatusText(wxT("Data send successfully"));
 }
@@ -275,16 +277,17 @@ void MyFrame::OnReceive(wxCommandEvent &event)
 {
     std::ifstream istrm("../txt/out.txt", std::ios::in | std::ios::binary);
     std::pair<char[15], int> tmp;
-    auto conv = [&](const wxString &str, char arr[]) {
-        strcpy(arr, (const char *)str.mb_str(wxConvUTF8));
-        arr[str.length()] = '\0';
-    };
-    while (!istrm.eof())
+    wxString out = "";
+    int packetsReceived = 0;
+    time_t start, end;
+    time(&start);
+    while (!istrm.eof() && packetsReceived != packetsSent)
     {
         try
         {
             istrm.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
             queue.enQueue(tmp.first, tmp.second);
+            ++packetsReceived;
         }
         catch (const std::exception &e)
         {
@@ -294,14 +297,21 @@ void MyFrame::OnReceive(wxCommandEvent &event)
             break;
         }
     }
-    std::ostream ostrm(editor);
-    istrm.close();
-    if (queue.display(ostrm).fail())
+    queue.sort();
+    while(!queue.isEmpty())
     {
-        *console << wxT("Error while displaying data\n");
+        out += queue.getFrontNode()->getElem();
+        out += " ";
+        queue.deQueue();
     }
 
+    *editor << out;
+    time(&end);
+    istrm.close();
     *console << wxT("Receiving data...\n");
+    *console << wxT("Received ") << packetsReceived << " packets\n";
+    *console << wxT("Lost packets: ") << packetsSent - packetsReceived << "\n";
+    *console << wxT("Execution time: ") << double(end - start) << " seconds\n";
     statBar->SetStatusText(wxT("Data received successfully"));
 }
 
