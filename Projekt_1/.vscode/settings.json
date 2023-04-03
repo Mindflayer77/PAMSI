@@ -51,6 +51,9 @@
         "regex": "cpp",
         "fstream": "cpp",
         "iomanip": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "cstring": "cpp",
+        "map": "cpp",
+        "set": "cpp"
     }
 }
