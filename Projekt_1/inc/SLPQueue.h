@@ -19,7 +19,6 @@ template <typename T> class SLPQueue
             deQueue();
     }
     void enQueue(const T &newElem, const int &priority);
-    void enQueue(SNode<T> *newNode);
     void deQueue();
     SNode<T> *removeMin();
     bool isEmpty() const;
@@ -33,46 +32,10 @@ template <typename T> class SLPQueue
     {
         return front;
     }
-    const T &min() const;
+    const SNode<T> *const min() const;
     void display() const;
-    bool remove(const T &elem);
     void sort();
 };
-
-// tutaj chodzi o to , że musimy mieć wskaźnik na element poprzedni
-//  do tego, który chcemy usunąć, więc musimy sprawdzać z wyprzedzeniem,
-//  czy następny element będzie tym, którego szukamy
-//  jest to najprostszy sposób implementacji usuwania elementu wewnątrz listy
-//  funkcja zwraca true jeśli znaleźliśmy szukany element
-//  oraz zwraca false, jeśli w całej liście nie ma danego elementu
-template <typename T> bool SLPQueue<T>::remove(const T &elemRmv)
-{
-    SNode<T> *iter = front; // ustawiamy iterator na poczatek listy
-    SNode<T> *tmp = nullptr;
-    if (isEmpty()) // jesli jest pusta lista to zwracamy false;
-        return false;
-    if (iter->elem == elemRmv)
-    {              // jezeli element jest na poczatku listy
-        deQueue(); // usuwamy pierwszy element listy;
-        return true;
-    }
-    while (iter != back)
-    { // dopoki nie dojdzie do konca listy
-        if (iter->next->elem == elemRmv)
-        {                                  // sprawdzamy element w następnym Node
-            tmp = iter->next;              // ustawiamy tymczasowy wskaznik na element który chcemy
-                                           // usunąć
-            iter->next = iter->next->next; // przesuwmy wskaznik na kolejny element
-            delete tmp;
-            return true;
-        }
-        else
-        {
-            iter = iter->next; // jak nie znaleźliśmy to przechodzimy dalej
-        }
-    }
-    return false;
-}
 
 template <typename T> void SLPQueue<T>::display() const
 {
@@ -117,15 +80,14 @@ template <typename T> const T &SLPQueue<T>::getBack() const
     return t;
 }
 
-template <typename T> const T &SLPQueue<T>::min() const
+template <typename T> const SNode<T> *const SLPQueue<T>::min() const
 {
-    SNode<T> *iter = front;
-    static T min;
+    SNode<T> *iter = front, *min = front;
     while (iter != back)
     {
-        if (iter->priority > iter->next->priority)
+        if (min->priority > iter->next->priority)
         {
-            min = iter->next->priority;
+            min = iter->next;
         }
         iter = iter->next;
     }
@@ -202,20 +164,6 @@ template <typename T> void SLPQueue<T>::enQueue(const T &newElem, const int &pri
     size++;
 }
 
-template <typename T> void SLPQueue<T>::enQueue(SNode<T> *newNode)
-{
-    newNode->next = nullptr;
-    if (isEmpty())
-    {
-        front = back = newNode;
-    }
-    else
-    {
-        back->next = newNode;
-        back = newNode;
-    }
-    size++;
-}
 
 template <typename T> void SLPQueue<T>::deQueue()
 {

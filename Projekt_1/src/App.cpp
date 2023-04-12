@@ -1,6 +1,3 @@
-// wxWidgets "Hello World" Program
-
-// For compilers that support precompilation, includes "wx/wx.h".
 #include <wx/notebook.h>
 #include <wx/splitter.h>
 #include <wx/tokenzr.h>
