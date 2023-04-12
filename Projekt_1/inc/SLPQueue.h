@@ -168,7 +168,7 @@ template <typename T> void SLPQueue<T>::deQueue()
 {
     if (isEmpty())
     {
-        throw QueueEmpty("Queue is empty\n");
+        std::cerr << "Error while removing element: Queue is empty!\n";
         return;
     }
     else

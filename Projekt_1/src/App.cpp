@@ -172,9 +172,6 @@ MyFrame::MyFrame(wxWindow *parent, wxWindowID id, const wxString &title, const w
     rightBottom_sizer->Add(console, 1, wxEXPAND | wxALL, 0);
     wxLog::SetActiveTarget(new wxLogTextCtrl(console));
 
-    // container = new wxNotebook(rightTop, ID_CONTAINER);
-    // container->SetImageList(img); // Lista obrazów drzewa projektu
-    // rightTop_sizer->Add(container, 1, wxEXPAND | wxALL, 0);
     editor = new wxTextCtrl(rightTop, ID_EDITOR, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     rightTop_sizer->Add(editor, 1, wxEXPAND | wxALL, 0);
 
@@ -218,7 +215,7 @@ void MyFrame::OnSend(wxCommandEvent &event)
     data = editor->GetValue();
     int priority = 1;
     wxStringTokenizer tokenizer(data, " ");
-    std::ofstream ostrm("../txt/out.txt", std::ios::out | std::ios::binary);
+    std::ofstream ostrm("../data/data.dat", std::ios::out | std::ios::binary);
     time_t start, end;
     time(&start);
     char arr[15];
@@ -272,7 +269,7 @@ void MyFrame::OnSend(wxCommandEvent &event)
 
 void MyFrame::OnReceive(wxCommandEvent &event)
 {
-    std::ifstream istrm("../txt/out.txt", std::ios::in | std::ios::binary);
+    std::ifstream istrm("../data/data.dat", std::ios::in | std::ios::binary);
     std::pair<char[15], int> tmp;
     wxString out = "";
     int packetsReceived = 0;
@@ -317,6 +314,6 @@ void MyFrame::OnNewFile(wxCommandEvent &event)
     editor->Clear();
     statBar->SetStatusText(wxT("Created a new file"));
     *console << wxT("Creating a new file...\n");
-    if (remove("../txt/out.txt") != 0)
+    if (remove("../data/data.dat") != 0)
         perror("Error occured: ");
 }
