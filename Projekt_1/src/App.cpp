@@ -1,14 +1,16 @@
-// wxWidgets "Hello World" Program
-
-// For compilers that support precompilation, includes "wx/wx.h".
 #include <wx/notebook.h>
 #include <wx/splitter.h>
+#include <wx/tokenzr.h>
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include "../inc/SLPQueue.h"
+#include "../inc/Utility.h"
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <set>
 
 const wxString appName = "Project number 1";
 
@@ -24,6 +26,9 @@ class MyFrame : public wxFrame
     MyFrame(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style);
 
   private:
+    SLPQueue<wxString> queue;
+    int packetsSent;
+
     wxMenu *menuFile;
     wxMenu *menuHelp;
     wxMenuBar *menuBar;
@@ -167,9 +172,6 @@ MyFrame::MyFrame(wxWindow *parent, wxWindowID id, const wxString &title, const w
     rightBottom_sizer->Add(console, 1, wxEXPAND | wxALL, 0);
     wxLog::SetActiveTarget(new wxLogTextCtrl(console));
 
-    // container = new wxNotebook(rightTop, ID_CONTAINER);
-    // container->SetImageList(img); // Lista obrazów drzewa projektu
-    // rightTop_sizer->Add(container, 1, wxEXPAND | wxALL, 0);
     editor = new wxTextCtrl(rightTop, ID_EDITOR, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
     rightTop_sizer->Add(editor, 1, wxEXPAND | wxALL, 0);
 
@@ -209,52 +211,101 @@ void MyFrame::OnHello(wxCommandEvent &event)
 
 void MyFrame::OnSend(wxCommandEvent &event)
 {
-    wxString data;
-    int line = 0;
-    int numLines = editor->GetNumberOfLines();
-    std::ofstream ostrm("../txt/out.txt", std::ios::out | std::ios::app);
-    while (line != numLines)
+    wxString data, token;
+    data = editor->GetValue();
+    int priority = 1;
+    wxStringTokenizer tokenizer(data, " ");
+    std::ofstream ostrm("../data/data.dat", std::ios::out | std::ios::binary);
+    time_t start, end;
+    time(&start);
+    char arr[15];
+    auto conv = [&](const wxString &str, char arr[]) {
+        strcpy(arr, (const char *)str.mb_str(wxConvUTF8));
+        arr[str.length()] = '\0';
+    };
+    while (tokenizer.HasMoreTokens())
+    {
+        token = tokenizer.GetNextToken();
+        queue.enQueue(token, priority++);
+    }
+    int size = queue.getSize();
+    std::set<int> genNum;
+    std::pair<char[15], int> tmp;
+    srand((unsigned)time(NULL));
+    int pos = rand() % size + 1;
+    genNum.insert(pos);
+    while (genNum.size() != size)
     {
         try
         {
-            data = editor->GetLineText(line++);
-            ostrm << data;
-            if (line != numLines)
-                ostrm << "\n";
+            conv(queue.getFrontNode()->getElem(), tmp.first);
+            tmp.second = queue.getFrontNode()->getPriority();
+            ostrm.seekp((pos - 1) * sizeof(tmp));
+            ostrm.write(reinterpret_cast<const char *>(&tmp), sizeof(tmp));
+            genNum.insert(pos);
+            queue.deQueue();
+            while (contains(genNum, pos) && genNum.size() != size)
+            {
+                pos = rand() % size + 1;
+            }
         }
         catch (const std::exception &e)
         {
             std::cerr << e.what() << '\n';
             ostrm.close();
             event.Skip();
+            break;
         }
     }
     ostrm.close();
+    time(&end);
     editor->Clear();
+    packetsSent = priority - 1;
     *console << wxT("Sending data...\n");
+    *console << wxT("Sent ") << packetsSent << wxT(" packets\n");
+    *console << wxT("Execution time: ") << double(end - start) << " seconds\n";
     statBar->SetStatusText(wxT("Data send successfully"));
 }
 
 void MyFrame::OnReceive(wxCommandEvent &event)
 {
-    std::string data = "";
-    std::ifstream istrm("../txt/out.txt", std::ios::in);
-    while (!istrm.eof())
+    std::ifstream istrm("../data/data.dat", std::ios::in | std::ios::binary);
+    std::pair<char[15], int> tmp;
+    wxString out = "";
+    int packetsReceived = 0;
+    time_t start, end;
+    time(&start);
+    while (!istrm.eof() && packetsReceived != packetsSent)
     {
         try
         {
-            istrm >> data;
-            *editor << data << " ";
+            istrm.read(reinterpret_cast<char *>(&tmp), sizeof(tmp));
+            queue.enQueue(tmp.first, tmp.second);
+            ++packetsReceived;
         }
         catch (const std::exception &e)
         {
             std::cerr << e.what() << '\n';
             istrm.close();
             event.Skip();
+            break;
         }
     }
+    queue.sort();
+    while(!queue.isEmpty())
+    {
+        out += queue.getFrontNode()->getElem();
+        out += " ";
+        queue.deQueue();
+    }
+
+    *editor << out;
+    time(&end);
     istrm.close();
     *console << wxT("Receiving data...\n");
+    *console << wxT("Received ") << packetsReceived << " packets\n";
+    *console << wxT("Lost packets: ") << packetsSent - packetsReceived << "\n";
+    *console << wxT("Execution time: ") << double(end - start) << " seconds\n";
     statBar->SetStatusText(wxT("Data received successfully"));
 }
 
@@ -263,4 +314,6 @@ void MyFrame::OnNewFile(wxCommandEvent &event)
     editor->Clear();
     statBar->SetStatusText(wxT("Created a new file"));
     *console << wxT("Creating a new file...\n");
+    if (remove("../data/data.dat") != 0)
+        perror("Error occured: ");
 }
