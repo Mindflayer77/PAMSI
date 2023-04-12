@@ -367,6 +367,8 @@ build/CMakeCache.txt
 build/CMakeFiles
 build/CMakeScripts
 build/Testing
+build/.cmake*
+build/CMakeFiles*
 Makefile
 build/cmake_install.cmake
 build/install_manifest.txt
