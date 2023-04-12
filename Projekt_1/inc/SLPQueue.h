@@ -1,5 +1,4 @@
 #pragma once
-#include "QueueEmpty.h"
 #include "SNode.h"
 
 template <typename T> class SLPQueue
