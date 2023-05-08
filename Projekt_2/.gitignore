@@ -6,6 +6,7 @@ build/Testing
 build/.cmake*
 build/CMakeFiles*
 Makefile
+build/vgcore*
 build/cmake_install.cmake
 build/install_manifest.txt
 build/compile_commands.json
@@ -17,3 +18,8 @@ build/_deps
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+.vscode
+script.sh
+out.txt
+test.csv
+test2.csv
