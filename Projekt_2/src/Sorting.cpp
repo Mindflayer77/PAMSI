@@ -12,37 +12,9 @@ void swap(Movie *a, Movie *b)
     *b = tmp;
 }
 
-int median(const std::vector<int> &tab)
-{
-    int sIdx, bIdx;
-    int min = tab[0];
-    int max = tab[0];
-	int med = 0;
-    for (int i = 0; i < tab.size(); ++i)
-    {
-        if (tab[i] < min)
-        {
-            min = tab[i];
-            sIdx = i;
-        }
-        if (tab[i] > max)
-        {
-            max = tab[i];
-            bIdx = i;
-        }
-    }
-	for(int j = 0; j < tab.size(); ++j){
-		if(j != sIdx && j != bIdx){
-			med = tab[j];
-		}
-	}
-	return med;
-}
-
 int partition(std::vector<Movie> &arr, int low, int high)
 {
-    //int pivot = median({arr[low].getRating(),arr[(high-low)/2].getRating(), arr[high].getRating()});
-	int pivot = arr[high].getRating();
+    int pivot = arr[high].getRating();
     int i = low - 1;
     for (int j = low; j < high; ++j)
     {
@@ -63,5 +35,74 @@ void quickSort(std::vector<Movie> &arr, int low, int high)
         int pi = partition(arr, low, high);
         quickSort(arr, low, pi - 1);
         quickSort(arr, pi + 1, high);
+    }
+}
+
+void merge(std::vector<Movie> &arr, int low, int mid, int high)
+{
+    // size of arrays to merge
+    int sizeLeft = mid - low + 1;
+    int sizeRight = high - mid;
+
+    // temporary arrays
+    std::vector<Movie> left;
+    std::vector<Movie> right;
+
+    // copying data
+    for (int i = 0; i < sizeLeft; ++i)
+    {
+        left.push_back(arr[low + i]);
+    }
+    for (int j = 0; j < sizeRight; ++j)
+    {
+        right.push_back(arr[mid + 1 + j]);
+    }
+
+	// merging arrays
+    // Initial indexes of first and second subarrays
+    int i = 0, j = 0;
+
+    // Initial index of merged subarray array
+    int k = low;
+    while (i < sizeLeft && j < sizeRight)
+    {
+        if (left[i].getRating() <= right[j].getRating())
+        {
+            arr[k] = left[i];
+            ++i;
+        }
+        else
+        {
+            arr[k] = right[j];
+            ++j;
+        }
+        ++k;
+    }
+
+    // Copy remaining elements of left if any
+    while (i < sizeLeft)
+    {
+        arr[k] = left[i];
+        ++i;
+        ++k;
+    }
+
+    /* Copy remaining elements of right if any */
+    while (j < sizeRight)
+    {
+        arr[k] = right[j];
+        ++j;
+        ++k;
+    }
+}
+
+void mergeSort(std::vector<Movie> &arr, int low, int high)
+{
+    if (low < high)
+    {
+        int mid = low + (high - low) / 2;
+        mergeSort(arr, low, mid);
+        mergeSort(arr, mid + 1, high);
+        merge(arr, low, mid, high);
     }
 }
