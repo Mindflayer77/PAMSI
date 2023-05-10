@@ -14,17 +14,17 @@ int main()
     std::vector<Movie> data;
     std::ifstream istrm("../Data.csv", std::ios::in);
     std::ofstream ostrm("../out.txt",std::ios::out | std::ios::app);
-    // if (istrm.is_open())
-    // {
-    //     readData(istrm, data);
-    // }
-    srand(unsigned(time(NULL)));
-    for(int i = 0; i < 1000000; ++i){
-        data.push_back(Movie("name", rand() % 10000 + 1));
+    if (istrm.is_open())
+    {
+        readData(istrm, data);
     }
+    // srand(unsigned(time(NULL)));
+    // for(int i = 0; i < 1000000; ++i){
+    //     data.push_back(Movie("name", rand() % 100000 + 1));
+    // }
     auto start = std::chrono::high_resolution_clock::now();
-    mergeSort(data,0,data.size()-1);
-    //quickSort(data,0,data.size()-1);
+    //mergeSort(data,0,data.size()-1);
+    quickSort(data,0,data.size()-1);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     for(int i = 0; i< data.size(); ++i){
@@ -33,6 +33,6 @@ int main()
     std::cout << "Elements sorted: " << data.size() << std::endl;
     std::cout << "Sorting time: " << duration.count() << " miliseconds" << std::endl;
     //delete[] data;
-    remove("../out.txt");
+    //remove("../out.txt");
     return 0;
 }

@@ -12,29 +12,30 @@ void swap(Movie *a, Movie *b)
     *b = tmp;
 }
 
-int partition(std::vector<Movie> &arr, int low, int high)
-{
-    int pivot = arr[high].getRating();
-    int i = low - 1;
-    for (int j = low; j < high; ++j)
-    {
-        if (arr[j].getRating() < pivot)
-        {
-            ++i;
-            swap(&arr[i], &arr[j]);
-        }
-    }
-    swap(&arr[i + 1], &arr[high]);
-    return i + 1;
-}
-
 void quickSort(std::vector<Movie> &arr, int low, int high)
 {
     if (low < high)
     {
-        int pi = partition(arr, low, high);
-        quickSort(arr, low, pi - 1);
-        quickSort(arr, pi + 1, high);
+        int pivot = arr[high].getRating();
+        int i = low - 1;
+        int j = high+1;
+        while (1)
+        {
+            while (pivot > arr[++i].getRating())
+                ;
+            while (pivot < arr[--j].getRating())
+                ;
+            if (i <= j)
+            {
+                swap(&arr[i], &arr[j]);
+            }
+            else
+                break;
+        }
+        if(j > low)
+        quickSort(arr, low, j);
+        if(j < high)
+        quickSort(arr, i, high);
     }
 }
 
@@ -58,7 +59,7 @@ void merge(std::vector<Movie> &arr, int low, int mid, int high)
         right.push_back(arr[mid + 1 + j]);
     }
 
-	// merging arrays
+    // merging arrays
     // Initial indexes of first and second subarrays
     int i = 0, j = 0;
 
