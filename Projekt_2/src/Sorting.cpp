@@ -1,4 +1,5 @@
 #include "../inc/Sorting.h"
+#include "../inc/Graphics.h"
 #include "../inc/Movie.h"
 #include <SDL2/SDL.h>
 #include <algorithm>
@@ -8,21 +9,6 @@
 #include <thread>
 #include <time.h>
 #include <vector>
-
-void drawState(std::vector<Movie> &vec, SDL_Renderer *renderer, uint red, uint blue)
-{
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    int idx = 400;
-    for (const Movie &elem : vec)
-    {
-
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderDrawLine(renderer, idx, 99, idx, elem.getRating());
-        idx -= 1;
-    }
-    SDL_RenderPresent(renderer);
-}
 
 void swap(Movie *a, Movie *b)
 {
@@ -47,6 +33,8 @@ void quickSort(std::vector<Movie> &arr, int low, int high, SDL_Renderer *rendere
             if (i <= j)
             {
                 swap(&arr[i], &arr[j]);
+                if (renderer != nullptr)
+                    drawState(arr, renderer, i, j);
             }
             else
                 break;
@@ -60,7 +48,7 @@ void quickSort(std::vector<Movie> &arr, int low, int high, SDL_Renderer *rendere
     }
 }
 
-void merge(std::vector<Movie> &arr, int low, int mid, int high)
+void merge(std::vector<Movie> &arr, int low, int mid, int high, SDL_Renderer *renderer)
 {
     int i, j, k;
     int sizeLeft = mid - low + 1;
@@ -84,18 +72,25 @@ void merge(std::vector<Movie> &arr, int low, int mid, int high)
         if (leftArr[i].getRating() <= rightArr[j].getRating())
         {
             arr[k] = leftArr[i];
+            if (renderer != nullptr)
+                drawState(arr, renderer, k, i + low);
             i++;
         }
         else
         {
             arr[k] = rightArr[j];
+            if (renderer != nullptr)
+                drawState(arr, renderer, k, j + low);
             j++;
         }
+
         k++;
     }
     while (i < sizeLeft)
     {
         arr[k] = leftArr[i];
+        if (renderer != nullptr)
+            drawState(arr, renderer, k, i + low);
         i++;
         k++;
     }
@@ -103,6 +98,8 @@ void merge(std::vector<Movie> &arr, int low, int mid, int high)
     while (j < sizeRight)
     {
         arr[k] = rightArr[j];
+        if (renderer != nullptr)
+            drawState(arr, renderer, k, j + low);
         j++;
         k++;
     }
@@ -117,7 +114,7 @@ void mergeSort(std::vector<Movie> &arr, int low, int high, SDL_Renderer *rendere
         int mid = low + (high - low) / 2;
         mergeSort(arr, low, mid, renderer);
         mergeSort(arr, mid + 1, high, renderer);
-        merge(arr, low, mid, high);
+        merge(arr, low, mid, high, renderer);
     }
 }
 
@@ -142,6 +139,8 @@ void insertionSort(std::vector<Movie> &arr, int low, int high, SDL_Renderer *ren
         while (j > left && arr[j - 1].getRating() > key)
         {
             arr[j] = arr[j - 1];
+            if (renderer != nullptr)
+                drawState(arr, renderer, j, j - 1);
             j--;
         }
         arr[j].setRating(key);
@@ -151,8 +150,9 @@ void insertionSort(std::vector<Movie> &arr, int low, int high, SDL_Renderer *ren
     return;
 }
 
-void heapify(std::vector<Movie> &arr, int low, int high, int i)
+void heapify(std::vector<Movie> &arr, int low, int high, int i, SDL_Renderer *renderer)
 {
+    int idx = low + i - 1;
     Movie tmp = arr[low + i - 1];
     int child = -1;
     while (i <= high / 2)
@@ -163,18 +163,22 @@ void heapify(std::vector<Movie> &arr, int low, int high, int i)
         if (tmp.getRating() >= arr[low + child - 1].getRating())
             break;
         arr[low + i - 1] = arr[low + child - 1];
+        if (renderer != nullptr)
+            drawState(arr, renderer, low + i - 1, low + child - 1);
         i = child;
     }
     arr[low + i - 1] = tmp;
+    if (renderer != nullptr)
+        drawState(arr, renderer, low + i - 1, idx);
 }
 
 // Main function to do heap sort
-void heapSort(std::vector<Movie> &arr, int low, int high, int size)
+void heapSort(std::vector<Movie> &arr, int low, int high, int size, SDL_Renderer *renderer)
 {
     size = high - low;
     // Build heap (rearrange array)
     for (int i = size / 2; i >= 1; i--)
-        heapify(arr, low, size, i);
+        heapify(arr, low, size, i, renderer);
 
     // One by one extract an element
     // from heap
@@ -183,9 +187,11 @@ void heapSort(std::vector<Movie> &arr, int low, int high, int size)
 
         // Move current root to end
         swap(&arr[low], &arr[low + i]);
+        if (renderer != nullptr)
+            drawState(arr, renderer, low, low + i);
 
         // call max heapify on the reduced heap
-        heapify(arr, low, i, 1);
+        heapify(arr, low, i, 1, renderer);
     }
 }
 
@@ -195,21 +201,21 @@ void introSort(std::vector<Movie> &arr, int low, int high, SDL_Renderer *rendere
     introSortBody(arr, low, high, maxDepth, renderer);
 }
 
-int partition(std::vector<Movie> &arr, int low, int high)
-{
-    int pivot = arr[high].getRating();
-    int i = low - 1;
-    for (int j = low; j <= high - 1; ++j)
-    {
-        if (arr[j].getRating() <= pivot)
-        {
-            ++i;
-            swap(&arr[i], &arr[j]);
-        }
-    }
-    swap(&arr[i + 1], &arr[high]);
-    return (i + 1);
-}
+// int partition(std::vector<Movie> &arr, int low, int high)
+// {
+//     int pivot = arr[high].getRating();
+//     int i = low - 1;
+//     for (int j = low; j <= high - 1; ++j)
+//     {
+//         if (arr[j].getRating() <= pivot)
+//         {
+//             ++i;
+//             swap(&arr[i], &arr[j]);
+//         }
+//     }
+//     swap(&arr[i + 1], &arr[high]);
+//     return (i + 1);
+// }
 
 int findPivot(std::vector<Movie> &arr, int low, int mid, int high)
 {
@@ -234,11 +240,13 @@ void introSortBody(std::vector<Movie> &arr, int low, int high, int maxDepth, SDL
     {
         if (maxDepth == 0)
         {
-            heapSort(arr, low, high, size);
+            heapSort(arr, low, high, size, renderer);
             return;
         }
         int pivot = findPivot(arr, low, low + ((high - low) / 2) + 1, high);
         swap(&arr[pivot], &arr[high]);
+        if (renderer != nullptr)
+            drawState(arr, renderer, pivot, high);
         // int p = partition(arr, low, high);
         // introSortBody(arr, low, p, maxDepth - 1, renderer);
         // introSortBody(arr, p + 1, high, maxDepth - 1, renderer);
@@ -261,9 +269,9 @@ void introSortBody(std::vector<Movie> &arr, int low, int high, int maxDepth, SDL
                 drawState(arr, renderer, i, j);
         }
         if (j > low)
-            introSortBody(arr, low, j, maxDepth-1, renderer);
+            introSortBody(arr, low, j, maxDepth - 1, renderer);
         if (j < high)
-            introSortBody(arr, i, high, maxDepth-1, renderer);
+            introSortBody(arr, i, high, maxDepth - 1, renderer);
     }
     else
     {
