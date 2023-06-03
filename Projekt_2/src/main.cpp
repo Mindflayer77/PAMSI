@@ -1,9 +1,4 @@
 #include "../inc/Game.h"
-#include "../inc/Movie.h"
-#include "../inc/ReadData.h"
-#include "../inc/Sorting.h"
-#include "../inc/TextureManager.h"
-#include "../inc/Visualization.h"
 #include <SDL2/SDL.h>
 
 Game *game = nullptr;

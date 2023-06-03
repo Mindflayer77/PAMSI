@@ -16,9 +16,6 @@ public:
         this->rating = assignMovie.getRating();
         return *this;
     }
-    // Movie& operator * (){
-    //     return *this;
-    // }
     void setRating(const int& newRating){
         rating = newRating;
     }

@@ -142,14 +142,9 @@ void Game::handleEvents()
 void Game::render()
 {
     SDL_RenderClear(renderer);
-    if (state == 0)
+    if (state == 0 || state == 1)
     {
         SDL_RenderCopy(renderer, backgroundImg, NULL, NULL);
-    }
-    if (state == 1)
-    {
-        SDL_RenderCopy(renderer, backgroundImg, NULL, NULL);
-        //SDL_RenderCopy(renderer, visualizationMenu, NULL, NULL);
     }
     SDL_RenderPresent(renderer);
 }
