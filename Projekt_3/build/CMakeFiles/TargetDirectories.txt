@@ -1,0 +1,3 @@
+/home/mindflayer/Documents/c++/PAMSI/Projekt_3/build/CMakeFiles/Game.dir
+/home/mindflayer/Documents/c++/PAMSI/Projekt_3/build/CMakeFiles/edit_cache.dir
+/home/mindflayer/Documents/c++/PAMSI/Projekt_3/build/CMakeFiles/rebuild_cache.dir
