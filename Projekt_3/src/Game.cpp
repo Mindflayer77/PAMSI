@@ -20,6 +20,7 @@ Game::Game()
     drawO = false;
     drawGrid = false;
     winner = '\0';
+    state = 0;
     for (uint j = 0; j < sizeBoard; ++j)
     {
         for (uint i = 0; i < sizeBoard; ++i)
@@ -42,6 +43,7 @@ Game::Game(uint size)
     drawO = false;
     drawGrid = false;
     winner = '\0';
+    state = 0;
     for (uint j = 0; j < size; ++j)
     {
         for (uint i = 0; i < size; ++i)
@@ -132,9 +134,58 @@ bool Game::validMove(int x, int y) const
     return false;
 }
 
+void Game::setGame(int size)
+{
+    if (size >= 3 && size <= 6)
+    {
+        sizeBoard = size;
+    }
+    if (size == 5)
+    {
+        maxDepth = size;
+    }
+    if(size == 6)
+    {
+        maxDepth = size-1;
+    }
+    else
+    {
+        maxDepth = size + 1;
+    }
+   board.clear();
+    std::vector<char> row;
+    for (uint j = 0; j < sizeBoard; ++j)
+    {
+        for (uint i = 0; i < sizeBoard; ++i)
+        {
+            row.emplace_back('_');
+        }
+        board.push_back(row);
+        row.clear();
+    }
+    drawGrid = true;
+    state = 1;
+    currentPlayer = 'O';
+}
+
+void Game::resetGame()
+{
+//    board.clear();
+    finished = false;
+    moves = 0;
+    state = 0;
+    winner = '\0';
+    drawX = false;
+    drawO = false;
+    drawGrid = false;
+    maxDepth = 0;
+    SDL_RenderClear(renderer);
+    currentPlayer = 'X';
+}
+
 void Game::init(const char *title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
-    currentPlayer = 'O';
+    currentPlayer = 'X';
     int flags = 0;
     if (fullscreen)
     {
@@ -165,6 +216,7 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
             std::cout << "Renderer created successfully" << std::endl;
         }
         running = true;
+        TextureManager::setMenu(TextureManager::loadTexture("menu.png", renderer));
         TextureManager::setGrid(TextureManager::loadTexture("grid_3.png", renderer), 3);
         TextureManager::setGrid(TextureManager::loadTexture("grid_4.png", renderer), 4);
         TextureManager::setGrid(TextureManager::loadTexture("grid_5.png", renderer), 5);
@@ -174,7 +226,6 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
         TextureManager::setX_wins(TextureManager::loadTexture("X_wins.png", renderer));
         TextureManager::setO_wins(TextureManager::loadTexture("O_wins.png", renderer));
         TextureManager::setTie(TextureManager::loadTexture("Tie.png", renderer));
-        drawGrid = true;
     }
     else
     {
@@ -185,7 +236,7 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 
 void Game::handleEvents()
 {
-    if (currentPlayer == 'X' && finished!= true)
+    if (currentPlayer == 'X')
     {
         SDL_Event event;
         SDL_PollEvent(&event);
@@ -194,37 +245,64 @@ void Game::handleEvents()
         case SDL_QUIT:
             running = false;
             break;
+        case SDL_KEYDOWN:
+            if (event.key.keysym.sym == SDLK_3 && state == 0)
+            {
+                setGame(3);
+            }
+            else if (event.key.keysym.sym == SDLK_4 && state == 0)
+            {
+                setGame(4);
+            }
+            else if (event.key.keysym.sym == SDLK_5 && state == 0)
+            {
+                setGame(5);
+            }
+            else if (event.key.keysym.sym == SDLK_6 && state == 0)
+            {
+                setGame(6);
+            }
+            else if (event.key.keysym.sym == SDLK_ESCAPE)
+            {
+                resetGame();
+            }
+            break;
         case SDL_MOUSEBUTTONDOWN:
             std::cout << "Click" << std::endl;
             int x, y;
             SDL_GetMouseState(&x, &y);
             x = x / (WIN_WIDTH / sizeBoard);
             y = y / (WIN_HEIGHT / sizeBoard);
-            if (validMove(x, y) && finished != true)
+            if (validMove(x, y) && finished != true && state == 1)
             {
                 board[x][y] = 'X';
                 Xpos = {x, y};
+                Opos = {x, y};
                 ++moves;
                 int result = -5;
                 result = evaluate();
-                currentPlayer = 'O';
                 if (result == 1 || result == -1)
                 {
                     finished = true;
                     winner = 'X';
+                drawX = true;
+                return;
                 }
                 if (moves == sizeBoard * sizeBoard)
                 {
                     finished = true;
+                    drawX = true;
+                    return;
                 }
                 drawX = true;
+                currentPlayer = 'O';
             }
             break;
         default:
             break;
         }
     }
-    else if (finished != true)
+    else if (finished == false && state == 1)
     {
         int result = 0;
         int bestResult = -2;
@@ -236,8 +314,10 @@ void Game::handleEvents()
                 if (board[i][j] == '_')
                 {
                     board[i][j] = 'O';
-                    result = minimax(maxDepth, -10000, 10000, false);
+                    result = minimax(maxDepth + 1, -10000, 10000, false);
                     board[i][j] = '_';
+                    if (result == 10000 || result == -10000)
+                        result = 0;
                     if (result > bestResult)
                     {
                         bestResult = result;
@@ -247,14 +327,13 @@ void Game::handleEvents()
                 }
             }
         }
-        if (validMove(best.first, best.second) && finished != true)
+        if (validMove(best.first, best.second))
         {
             board[best.first][best.second] = 'O';
             Opos = {best.first, best.second};
             ++moves;
             int eval = -5;
             eval = evaluate();
-            currentPlayer = 'X';
             if (eval == 1 || eval == -1)
             {
                 finished = true;
@@ -264,6 +343,7 @@ void Game::handleEvents()
             {
                 finished = true;
             }
+            currentPlayer = 'X';
             drawO = true;
         }
     }
@@ -271,14 +351,20 @@ void Game::handleEvents()
 
 void Game::update()
 {
-    if (drawGrid)
+    if (state == 1 && drawGrid == true)
     {
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, TextureManager::getGrid(4), NULL, NULL);
+        SDL_RenderCopy(renderer, TextureManager::getGrid(sizeBoard), NULL, NULL);
         SDL_RenderPresent(renderer);
         drawGrid = false;
     }
-    if (drawX)
+    else if (state == 0)
+    {
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, TextureManager::getMenu(), NULL, NULL);
+        SDL_RenderPresent(renderer);
+    }
+    if (drawX && state == 1)
     {
         SDL_Rect rec = playerTextSize();
         rec.x = Xpos.first * (WIN_WIDTH / sizeBoard) + 30 / sizeBoard;
@@ -287,7 +373,7 @@ void Game::update()
         SDL_RenderPresent(renderer);
         drawX = false;
     }
-    if (drawO)
+    if (drawO && state == 1)
     {
         SDL_Rect rec = playerTextSize();
         rec.x = Opos.first * (WIN_WIDTH / sizeBoard) + 30 / sizeBoard;
@@ -296,7 +382,7 @@ void Game::update()
         SDL_RenderPresent(renderer);
         drawO = false;
     }
-    if (finished)
+    if (finished && state == 1)
     {
         SDL_Rect rec;
         rec.h = WIN_HEIGHT;
@@ -447,14 +533,71 @@ int Game::evaluate()
 }
 int Game::minimax(int depth, int alpha, int beta, bool maximizer)
 {
+    // int result = evaluate();
+    // //std::cout << result << std::endl;
+    // bool przerwanie = false;
+    // if (result != 0 || depth == 0)
+    // {
+    //     return result;
+    // }
+    // if (maximizer)
+    // {
+    //     for (int i = 0; i < sizeBoard; ++i)
+    //     {
+    //         for (int j = 0; j < sizeBoard; ++j)
+    //         {
+    //             if (board[i][j] == '_')
+    //             {
+    //                 board[i][j] = 'O';
+    //                 alpha = std::max(alpha, minimax(depth - 1, alpha, beta, true));
+    //                 board[i][j] = '_';
+    //                 if (alpha >= beta)
+    //                 {
+    //                     przerwanie = true;
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //         if (przerwanie == true)
+    //             break;
+    //     }
+    //     return alpha;
+    // }
+    // else
+    // {
+    //     for (int i = 0; i < sizeBoard; ++i)
+    //     {
+    //         for (int j = 0; j < sizeBoard; ++j)
+    //         {
+    //             if (board[i][j] == '_')
+    //             {
+    //                 board[i][j] = 'X';
+    //                 beta = std::min(beta, minimax(depth - 1, alpha, beta, true));
+    //                 board[i][j] = '_';
+    //                 if (alpha >= beta)
+    //                 {
+    //                     przerwanie = true;
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //         if (przerwanie == true)
+    //         {
+    //             break;
+    //         }
+    //     }
+    //     return beta;
+    // }
+
     int result = evaluate();
-    bool przerwanie = false;
-    if (result != 0 || depth == 0)
+    if (depth == 0 || result != 0)
     {
         return result;
     }
+    bool przerwanie = false;
     if (maximizer)
     {
+        int value = -10000;
         for (int i = 0; i < sizeBoard; ++i)
         {
             for (int j = 0; j < sizeBoard; ++j)
@@ -462,22 +605,26 @@ int Game::minimax(int depth, int alpha, int beta, bool maximizer)
                 if (board[i][j] == '_')
                 {
                     board[i][j] = 'O';
-                    alpha = std::max(alpha, minimax(depth - 1, alpha, beta, false));
+                    value = std::max(value, minimax(depth - 1, alpha, beta, false));
                     board[i][j] = '_';
-                    if (alpha >= beta)
+                    if (value >= beta)
                     {
                         przerwanie = true;
                         break;
                     }
+                    alpha = std::max(value, alpha);
                 }
             }
             if (przerwanie == true)
+            {
                 break;
+            }
         }
-        return alpha;
+        return value;
     }
     else
     {
+        int value = 10000;
         for (int i = 0; i < sizeBoard; ++i)
         {
             for (int j = 0; j < sizeBoard; ++j)
@@ -485,13 +632,14 @@ int Game::minimax(int depth, int alpha, int beta, bool maximizer)
                 if (board[i][j] == '_')
                 {
                     board[i][j] = 'X';
-                    beta = std::min(beta, minimax(depth - 1, alpha, beta, true));
+                    value = std::min(value, minimax(depth - 1, alpha, beta, true));
                     board[i][j] = '_';
-                    if (alpha >= beta)
+                    if (value <= alpha)
                     {
                         przerwanie = true;
                         break;
                     }
+                    beta = std::min(beta, value);
                 }
             }
             if (przerwanie == true)
@@ -499,6 +647,6 @@ int Game::minimax(int depth, int alpha, int beta, bool maximizer)
                 break;
             }
         }
-        return beta;
+        return value;
     }
 }

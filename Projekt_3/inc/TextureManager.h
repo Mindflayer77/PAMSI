@@ -7,6 +7,7 @@
 class TextureManager
 {
   private:
+    static SDL_Texture *menu;
     static SDL_Texture *grid_3;
     static SDL_Texture *grid_4;
     static SDL_Texture *grid_5;
@@ -99,8 +100,17 @@ class TextureManager
     {
         return tie;
     }
+    static void setMenu(SDL_Texture *texture)
+    {
+        menu = texture;
+    }
+    static SDL_Texture *getMenu()
+    {
+        return menu;
+    }
 };
 
+SDL_Texture *TextureManager::menu = nullptr;
 SDL_Texture *TextureManager::grid_3 = nullptr;
 SDL_Texture *TextureManager::grid_4 = nullptr;
 SDL_Texture *TextureManager::grid_5 = nullptr;

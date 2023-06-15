@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26.3)
+cmake_minimum_required(VERSION 3.25.2)
 project(Game)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)

@@ -28,6 +28,7 @@ class Game
     bool drawX;
     bool drawO;
     bool drawGrid;
+    int state; //0 ---> menu, 1 ---> game
 
   public:
     Game();
@@ -43,14 +44,13 @@ class Game
     void setStatus(bool newStatus);
     void drawBoard() const;
     int evaluate();
-    std::pair<int, int> bestMove();
     int minimax(int depth, int alpha, int beta, bool maximizer);
-    std::pair<int, std::pair<int, int>> max(std::vector<std::vector<char>> tmpBoard, int depth, int alpha, int beta);
-    std::pair<int, std::pair<int, int>> min(std::vector<std::vector<char>> tmpBoard, int depth, int alpha, int beta);
     void setXpos(int x, int y);
     void setOpos(int x, int y);
     std::pair<int,int> getOpos() const;
     std::pair<int,int> getXpos() const;
     SDL_Rect playerTextSize() const;
     bool validMove(int x, int y) const;
+    void setGame(int size);
+    void resetGame();
 };
