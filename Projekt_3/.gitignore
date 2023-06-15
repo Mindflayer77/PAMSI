@@ -1,7 +1,7 @@
 .vscode
 
-.cmake
-CMakeFiles
+.cmake/.
+CMakeFiles/.
 Testing
 .ninja_deps
 .ninja_log
