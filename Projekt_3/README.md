@@ -1,0 +1,6 @@
+# Tic-Tac-Toe
+
+Here is a popular game of tic-tac-toe in C++. A player can choose the size of the board form 3 to 6. The winning conditions are similar to the basic version of the game: in order to win, the player has to mark the whole row, column or one of the diagonals.
+
+## Minimax
+In order for AI to make moves efficiently, the minimax algorithm was implemented. When AI starts, the game is unbeatable: the player always loses or there's a tie. 
