@@ -3,7 +3,7 @@ project(Game)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
-add_executable(Game inc/Game.h inc/TextureManager.h src/Game.cpp src/TextureManager.cpp src/main.cpp)
+add_executable(Game inc/Game.h inc/TextureManager.h src/Game.cpp src/main.cpp)
 target_link_libraries(Game "/usr/local/lib/libSDL2_image-2.0.so.0"
 "/usr/local/lib/libSDL2_image-2.0.so.0.600.2"
 "/usr/local/lib/libSDL2_image-2.0.so.0.600.3"

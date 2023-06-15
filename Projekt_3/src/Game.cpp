@@ -216,7 +216,7 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
             std::cout << "Renderer created successfully" << std::endl;
         }
         running = true;
-        TextureManager::setMenu(TextureManager::loadTexture("menu.png", renderer));
+        TextureManager::setMenu(TextureManager::loadTexture("Menu.png", renderer));
         TextureManager::setGrid(TextureManager::loadTexture("grid_3.png", renderer), 3);
         TextureManager::setGrid(TextureManager::loadTexture("grid_4.png", renderer), 4);
         TextureManager::setGrid(TextureManager::loadTexture("grid_5.png", renderer), 5);
@@ -264,11 +264,15 @@ void Game::handleEvents()
             }
             else if (event.key.keysym.sym == SDLK_ESCAPE)
             {
+                if(state == 0 )
+                {
+                    running = false;
+                    return;
+                }
                 resetGame();
             }
             break;
         case SDL_MOUSEBUTTONDOWN:
-            std::cout << "Click" << std::endl;
             int x, y;
             SDL_GetMouseState(&x, &y);
             x = x / (WIN_WIDTH / sizeBoard);
@@ -403,13 +407,6 @@ void Game::update()
         }
         SDL_RenderPresent(renderer);
     }
-    // std::cout << std::endl;
-    // drawBoard();
-    // std::cout << std::endl;
-    // if (finished)
-    // {
-    //     running = false;
-    // }
 }
 
 int Game::evaluate()
@@ -533,62 +530,6 @@ int Game::evaluate()
 }
 int Game::minimax(int depth, int alpha, int beta, bool maximizer)
 {
-    // int result = evaluate();
-    // //std::cout << result << std::endl;
-    // bool przerwanie = false;
-    // if (result != 0 || depth == 0)
-    // {
-    //     return result;
-    // }
-    // if (maximizer)
-    // {
-    //     for (int i = 0; i < sizeBoard; ++i)
-    //     {
-    //         for (int j = 0; j < sizeBoard; ++j)
-    //         {
-    //             if (board[i][j] == '_')
-    //             {
-    //                 board[i][j] = 'O';
-    //                 alpha = std::max(alpha, minimax(depth - 1, alpha, beta, true));
-    //                 board[i][j] = '_';
-    //                 if (alpha >= beta)
-    //                 {
-    //                     przerwanie = true;
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //         if (przerwanie == true)
-    //             break;
-    //     }
-    //     return alpha;
-    // }
-    // else
-    // {
-    //     for (int i = 0; i < sizeBoard; ++i)
-    //     {
-    //         for (int j = 0; j < sizeBoard; ++j)
-    //         {
-    //             if (board[i][j] == '_')
-    //             {
-    //                 board[i][j] = 'X';
-    //                 beta = std::min(beta, minimax(depth - 1, alpha, beta, true));
-    //                 board[i][j] = '_';
-    //                 if (alpha >= beta)
-    //                 {
-    //                     przerwanie = true;
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //         if (przerwanie == true)
-    //         {
-    //             break;
-    //         }
-    //     }
-    //     return beta;
-    // }
-
     int result = evaluate();
     if (depth == 0 || result != 0)
     {

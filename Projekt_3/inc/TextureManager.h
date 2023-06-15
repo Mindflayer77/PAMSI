@@ -31,7 +31,6 @@ class TextureManager
             dir = tmp;
         dir += "/img/";
         dir += fileName;
-        std::cout << dir << std::endl;
         SDL_Surface *surface = IMG_Load(dir.c_str());
         SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
