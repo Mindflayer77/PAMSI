@@ -1,4 +1,3 @@
 # Data Structures
-Program imituje przesyłanie pakietów wiadomości.
-Wykorzystano kolejkę priorytetową opartą na liście jednokierunkowej.
+The program is designed to simulate transfering data between users. The application allows the user to provide some text which can be later ,,sent" to another user. In reality the message is divided into smaller packages which are randomized and saved to a binary file. After pressing the ,,Receive" button, the data is decoded from the binary file and then presented to the user via textbox. The program is also provided with an option of creating a new file: the binnary file gets deleted and the textbox is cleared. In the bottom right corner there is a console which displays informations about ongoing processes and their execution time.
 W celu kompilacji programu, niezbędne jest zainstalowanie biblioteki wxWidgets 3.2.2
