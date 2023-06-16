@@ -9,4 +9,4 @@ In order for AI to make moves efficiently, the minimax algorithm with alpha-beta
 In aim of compiling the project, it is neccessary to have the required libraries installed: SDL2 and SDL2_image.
 
 ## Screenshots
-![Alt text](https://github.com/Mindflayer77/PAMSI/issues/3#issue-1760792323?raw=true "Grid 3x3")
+![image](https://github.com/Mindflayer77/PAMSI/assets/114955338/01d87937-91c7-4e90-93a0-b4296dce6b68)
