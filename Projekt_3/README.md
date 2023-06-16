@@ -7,3 +7,6 @@ In order for AI to make moves efficiently, the minimax algorithm with alpha-beta
 
 ## Compilation
 In aim of compiling the project, it is neccessary to have the required libraries installed: SDL2 and SDL2_image.
+
+## Screenshots
+![Alt text](/relative/path/to/img/menu.png?raw=true "Optional Title")
